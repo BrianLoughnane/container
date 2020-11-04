@@ -18,12 +18,32 @@ fetch(`${process.env.REACT_APP_CONTENT_HOST}/restaurants.json`)
 const getRandomRestaurantId = () =>
   Math.floor(Math.random() * numRestaurants) + 1;
 
-const Browse = ({ history }) => (
-  <MicroFrontend history={history} host={browseHost} name="Browse" />
-);
-const Restaurant = ({ history }) => (
-  <MicroFrontend history={history} host={restaurantHost} name="Restaurant" />
-);
+const parsePathRoot = (url) => {
+  if (url === '/') {
+    return url;
+  }
+  return `/${url.split('/')[1]}/`;
+}
+
+const Browse = ({ history, match }) => {
+  return (
+    <MicroFrontend
+      history={history}
+      host={browseHost}
+      pathRoot={parsePathRoot(match.url)}
+      name="Browse" />
+  );
+}
+
+const Restaurant = ({ history, match }) => {
+  return (
+    <MicroFrontend
+      history={history}
+      host={restaurantHost}
+      pathRoot={parsePathRoot(match.url)}
+      name="Restaurant" />
+  );
+}
 const Random = () => <Redirect to={`/restaurant/${getRandomRestaurantId()}`} />;
 
 const App = () => (
@@ -32,7 +52,7 @@ const App = () => (
       <AppHeader />
       <Switch>
         <Route exact path="/" component={Browse} />
-        <Route exact path="/restaurant/:id" component={Restaurant} />
+        <Route path="/restaurant/*" component={Restaurant} />
         <Route exact path="/random" render={Random} />
         <Route exact path="/about" render={About} />
       </Switch>
